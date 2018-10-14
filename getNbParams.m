@@ -29,6 +29,10 @@ params.texSize = 50; %number of elements on each side of random number matrix (w
 params.ITI = 1;
 params.stimDur = .05;%2;%.05;%2;%.05;%1;%.05;%.25;%4;
 
+% size parameters
+params.fixSize = 0.3;
+params.respDot = 0.45;
+
 % set up experiment table
 stimConds = fullfact([length(params.stimAngles) length(params.stimEcc)]); %unique stimulus conditions
 params.trialsPerCond = 2;%2;%2;%5;%4;%2;%5
