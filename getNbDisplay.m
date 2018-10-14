@@ -1,12 +1,11 @@
-function display = getPosDisplay(params)
-
-
+function display = getNbDisplay(params)
 display.screens = Screen('Screens');
 display.screenNumber = max(display.screens);
 
 display.white = WhiteIndex(display.screenNumber);
 display.black = BlackIndex(display.screenNumber);
 display.gray = round((display.white+display.black)/2);
+display.darkGray = round(display.white/3+display.black*2/3);
 
 switch params.computer
     case 1 %testing booth
@@ -31,9 +30,8 @@ switch params.computer
         
 end
 display.pixelSize = mean(display.dimensions./display.numPixels);
-
-
-[display.w display.screenRect]=Screen('OpenWindow',display.screenNumber,display.gray);
-[display.flipInterval display.nrValidSamples display.stddev]= Screen('GetFlipInterval', display.w);
+[display.w,display.screenRect]=Screen('OpenWindow',display.screenNumber,display.gray);
+display.centerCoords = display.screenRect(3:4)/2;
+[display.flipInterval,display.nrValidSamples,display.stddev]= Screen('GetFlipInterval', display.w);
 
 end
