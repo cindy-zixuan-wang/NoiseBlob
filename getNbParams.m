@@ -24,14 +24,15 @@ params.cycleDur = ((pi/params.phaseInterval)*(1/display.refresh)); %time it take
 
 %textured blob parameters
 params.texSize = 50; %number of elements on each side of random number matrix (will be scaled up to match size of texture)
-
+params.textSize = 25;
 %duration parameters
 params.ITI = 1;
+params.ISI = .5;
 params.stimDur = .05;%2;%.05;%2;%.05;%1;%.05;%.25;%4;
 
 % size parameters
 params.fixSize = 0.3;
-params.respDot = 0.45;
+params.respDotSize = 0.45;
 
 % set up experiment table
 stimConds = fullfact([length(params.stimAngles) length(params.stimEcc)]); %unique stimulus conditions
@@ -41,7 +42,10 @@ params.all_trials = params.all_trials(randperm(size(params.all_trials,1)),:);
 params.nTrials = length(params.all_trials);
 params.breakFrequency = 60;
 
+% key map
+KbName('UnifyKeyNames')
+
 % save pathway
 params.curFolder = pwd;
-params.filename = ['Results' params.subjID];
+params.filename = ['Results/' params.subjID];
 end

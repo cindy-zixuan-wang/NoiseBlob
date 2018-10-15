@@ -1,4 +1,4 @@
-function tex = makeNbTexuture(display,params,trial,tex)
+function tex = makeNbTextures(display,params,trial,tex)
 tex.matSize = 2*angle2pix(display, params.stimSize);
 randNoise = imresize(randi(2,params.texSize,params.texSize)-1,[tex.matSize tex.matSize],'nearest');
 stimMat = makeNoiseBlob(display,params,randNoise);
