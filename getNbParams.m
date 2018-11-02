@@ -1,12 +1,13 @@
 function [params,display] = getNbParams
 
 params.subjID = input('Enter subject ID: ','s');
+params.subjSession = input('Enter session number: ');
 params.computer = input('Enter testing computer: 1 for booth, 2 for laptop ');
 
 %stimulus parameters
-params.gaussSD = 1;%.1;%1;%*(9.5/7);%deg
-params.stimSize = 3;%5*(9.5/7); %width of half the texture (deg)
-params.circMaskRadius = 1.95; %deg
+params.gaussSD = 0.75;%.1;%1;%*(9.5/7);%deg
+params.stimSize = 5;%5*(9.5/7); %width of half the texture (deg)
+params.circMaskRadius = 2.44; %deg
 stimAngle = 7.5;
 params.stimAngles = stimAngle:stimAngle:360; %angles relative to the center of the screen
 params.stimEcc = 2:2:10;%9.5;%7;
@@ -38,6 +39,8 @@ params.respDotSize = 0.45;
 stimConds = fullfact([length(params.stimAngles) length(params.stimEcc)]); %unique stimulus conditions
 params.trialsPerCond = 2;%2;%2;%5;%4;%2;%5
 params.all_trials =repmat(stimConds,params.trialsPerCond,1);
+params.all_trials(:,1) = params.stimAngles(params.all_trials(:,1));
+params.all_trials(:,2) = params.stimEcc(params.all_trials(:,2));
 params.all_trials = params.all_trials(randperm(size(params.all_trials,1)),:);
 params.nTrials = length(params.all_trials);
 params.breakFrequency = 60;

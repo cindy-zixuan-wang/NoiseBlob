@@ -16,7 +16,7 @@ switch params.computer
 %         display.dimensions = [34.29 25.78]; %cm %for NEW MONITOR
         skipSyncIndex = 0;
         display.dimensions = [35.75 26]; %booth 6 1024 x 768 at 100 Hz
-        display.distance = 57; %cm of viewing distance
+        display.distance = 40; %cm of viewing distance
         display.cmapDepth = 8;
         display.refresh = 100;        
         Screen('Resolution', display.screenNumber, display.numPixels(1), display.numPixels(2), display.refresh);
@@ -25,7 +25,7 @@ switch params.computer
         display.numPixels = [1024 768];
 %         display.dimensions = [34.29 25.78];
         skipSyncIndex = 1;
-        display.dimensions = [35.75 26]; %booth 6 1024 x 768 at 100 Hz
+        display.dimensions = [31.4 21.9]; %booth 6 1024 x 768 at 100 Hz
         display.distance = 57; %cm of viewing distance
         display.cmapDepth = 8;
         display.refresh = 100;        
@@ -34,8 +34,9 @@ switch params.computer
 end
 
 Screen('Preference','SkipSyncTests',skipSyncIndex);
-display.pixelSize = mean(display.dimensions./display.numPixels);
+% display.pixelSize = mean(display.dimensions./display.numPixels);
 [display.w,display.screenRect]=Screen('OpenWindow',display.screenNumber,display.gray);
+Screen('BlendFunction', display.w, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 display.centerCoords = display.screenRect(3:4)/2;
 [display.flipInterval,display.nrValidSamples,display.stddev]= Screen('GetFlipInterval', display.w);
 
