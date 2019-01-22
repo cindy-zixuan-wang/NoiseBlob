@@ -1,4 +1,4 @@
-% all kinds of correlation
+% all kinds of correlation for angular errors
 clear all;
 clc;
 subj = {'LSC','WZX','JJ','JT','WS'};
@@ -7,6 +7,8 @@ subjNum = length(subj);
 for i = 1:subjNum
     cd(subj{i});
     load('data_all.mat');
+%     load('data_all_ecc.mat');
+%     data_all = data_all_ecc;
     dataAllSubj(:,i) = mean(data_all,2);
     dataByDay{i}(:,1:3) = [mean(data_all(:,1:2),2),mean(data_all(:,3:4),2),mean(data_all(:,5:6),2)];
     dataBySection{i}(:,1:6) = data_all;
@@ -163,6 +165,14 @@ bootBtwDayAll_sorted = sort(bootBtwDayAll);
 meanBootBtwDayAll = mean(bootBtwDayAll);
 CIBootBtwDayAll = bootBtwDayAll_sorted([iteration*0.025,iteration*0.975]);
 errBarBtwDayAll = abs(CIBootBtwDayAll-meanBootBtwDayAll);
+% p value
+bootDiffDistribution = bootWithinDayAll-bootBtwDayAll;
+bootPValue = sum(bootDiffDistribution>0)/length(bootDiffDistribution);
+if bootPValue < .5
+    bootTwoTailedP = bootPValue*2;
+else
+    bootTwoTailedP = (1-bootPValue)*2;
+end
 % plot
 h = bar([meanBootWithinDayAll,meanBootBtwDayAll]);
 h.FaceColor = [0.75,0.75,0.75];
@@ -176,6 +186,7 @@ H.Color = [0 0 0];
 ax = gca;
 ax.XTickLabel = {'Within-subject','Between-subject'};
 ax.YLabel.String = 'Correlation (Pearson R)';
-ax.Title.String='Exp 2 Results';
+ax.Title.String='Exp 1B Results';
 text(1.5, .76,'Error bar represents bootstrapping 95% CI');
-saveas(gcf,'Exp2CorrResults','png');
+% saveas(gcf,'Exp1BEccResults','png');
+saveas(gcf,'Exp1BAngResults','png');

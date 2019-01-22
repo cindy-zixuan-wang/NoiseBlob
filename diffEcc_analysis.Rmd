@@ -1,0 +1,105 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(ggplot2)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+
+```{r}
+setwd('/Users/zixuan/Box/Position ZW/diffEcc/NoiseBlob/Results/LSC')
+
+  df = read.csv('ang_data_mean.csv', header=TRUE, col.names = c('angle', 'radius', 'error'))
+
+  df_1 = read.csv('/Users/zixuan/Box/Position ZW/diffEcc/Vernier-Constant/Data/WS/vernier.csv',    header=TRUE, col.names = c('radius', 'angle','error'))
+  # setwd('/Users/zixuan/Box/Position ZW/diffEcc/NoiseBlob/Results')
+  png("ang_error.png", width = 500, height = 500)
+
+  ggplot(df, aes(x=angle, y=radius, fill=error)) +
+  geom_tile() +
+  scale_colour_gradient2(low = "blue", mid = "white",
+                         high = "red", midpoint = 0.6,space = "Lab",
+                         guide = "colourbar", aesthetics = "fill",limits = c(-15,15)) +  
+  coord_polar(start=pi/2, direction=1)
+  # geom_point(data=df_1, aes(x=angle, y=radius, colour=error),size=3) +
+  # scale_colour_gradient2(low = "blue", mid = "white",
+  #                        high = "red", midpoint = mean(df_1[,3]),space = "Lab",
+  #                        guide = "colourbar", aesthetics = "colour",limits = c(min(df_1[,3])-0.5,max(df_1[,3])+0.5)) +
+  # coord_polar(start=pi/2, direction=1)
+
+```
+
+```{r}
+setwd('/Users/zixuan/Box/Position ZW/diffEcc/NoiseBlob/Results/LSC')
+
+  df = read.csv('ecc_data_mean.csv', header=TRUE, col.names = c('angle', 'radius', 'error'))
+
+  df_1 = read.csv('/Users/zixuan/Box/Position ZW/diffEcc/Vernier-Constant/Data/WS/vernier.csv',    header=TRUE, col.names = c('radius', 'angle','error'))
+  png("ecc_error.png", width = 500, height = 500)
+
+  ggplot(df, aes(x=angle, y=radius, fill=error)) +
+  geom_tile() +
+  scale_colour_gradient2(low = "blue", mid = "white",
+                         high = "red", midpoint = 0.6,space = "Lab",
+                         guide = "colourbar", aesthetics = "fill") +  
+  coord_polar(start=pi/2, direction=1)
+
+```
+
+```{r}
+setwd('/Users/zixuan/Box/Position ZW/diffEcc/NoiseBlob/Results/WZX')
+
+  df = read.csv('WZX_data_mean.csv', header=TRUE, col.names = c('angle', 'radius', 'error'))
+  setwd('/Users/zixuan/Box/Position ZW/diffEcc/NoiseBlob/Results')
+  #png("5.png", width = 500, height = 500)
+
+  ggplot(df, aes(x=angle, y=radius, fill=error)) +
+  geom_tile() +
+  scale_colour_gradient2(colours=rainbow(2), aesthetics = "fill") +
+  coord_polar(start=pi/2, direction=1)
+  # scale_colour_gradient2(low = "blue", mid = "white",
+  #                        high = "red", midpoint = 0.6,space = "Lab",
+  #                        guide = "colourbar", aesthetics = "fill",limits = c(-15,15)) +  
+  # coord_polar(start=pi/2, direction=1) +
+  # geom_point(data=df_1, aes(x=angle, y=radius, colour=error),size=3) +
+  # scale_colour_gradient2(low = "blue", mid = "white",
+  #                        high = "red", midpoint = mean(df_1[,3]),space = "Lab",
+  #                        guide = "colourbar", aesthetics = "colour",limits = c(min(df_1[,3])-0.5,max(df_1[,3])+0.5)) +
+  # coord_polar(start=pi/2, direction=1)
+
+```
+
+```{r}
+df_1 = read.csv('/Users/zixuan/Box/Position ZW/diffEcc/Vernier-Constant/Data/WZX_rand/vernier.csv', header=TRUE, col.names = c('radius', 'angle','error'))
+ggplot(df_1, aes(x=angle, y=radius, colour=error)) +
+  geom_point() +
+  scale_colour_gradient2(low = "blue", mid = "white",
+                         high = "red", midpoint = 3.5,space = "Lab",
+                         guide = "colourbar", aesthetics = "colour",limits = c(2,5)) +
+  coord_polar(start=pi/2, direction=1)
+```
+
+```{r}
+df_1 = read.csv('Results/ZW/ZWdata_output_1.csv', header=TRUE, col.names = c('angle', 'radius', 'error'))
+df_1
+```
+
+```{r}
+ggplot(df, aes(x=x, y=y,  color=error)) + 
+  geom_point() +
+  coord_equal() + 
+  scale_colour_gradientn(colours=rainbow(4))
+```
+
