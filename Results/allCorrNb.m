@@ -17,8 +17,19 @@ end
 %% Within-subject correlation
 % trial-wise
 
-% section-wise
+% Split-half
 
+diffHalf = combinator(6,6/2,'c');
+for i = 1:length(subj)
+    for j = 1:length(diffHalf)
+        half_1 = mean(dataBySection{i}(:,diffHalf(j,:)),2);
+        half_2 = mean(dataBySection{i}(:,setdiff(1:6,diffHalf(j,:))),2);
+        r_half_all(j) = corr(half_1,half_2);
+    end
+        allSplitHalfZ(i) = nanmean(nanmean((log(1+r_half_all)-log(1-r_half_all))/2));
+end
+meanSplitHalfZ = mean(allSplitHalfZ);
+meanSplitHalfR =tanh(meanSplitHalfZ);
 % day-wise
 % all data
 clear r p z;
@@ -124,69 +135,80 @@ for ecc = 1:5
 end
 meanBtwSubjEcc = tanh(meanFisherZ);
 
-%% Bootstrap
-% Day-wise
-% Within
-clear zSample r p z
-for iteration = 1:1000
-    for subj = 1:subjNum
-        zSample(subj,:) = zWithinDayAll(subj,randsample(3,3,true));
-    end
-    bootWithinDayAll(iteration) = tanh(mean(mean(zSample,1,'omitnan'),'omitnan'));
-end
-bootWithinDayAll_sorted = sort(bootWithinDayAll);
-meanBootWithinDayAll = mean(bootWithinDayAll);
-CIBootWithinDayAll = bootWithinDayAll_sorted([iteration*0.025,iteration*0.975]);
-errBarWithinDayAll = abs(CIBootWithinDayAll-meanBootWithinDayAll);
-% Between
-clear zSample r p z
-for iteration = 1:1000   
-    for subj = 1:subjNum
-        sampleDataByDay{subj} = dataByDay{subj}(:,randsample(3,3,true));
-    end
-    for i = 1:subjNum
-        for j = 1:subjNum
-            if i<j
-                for  day_1 = 1:3
-                    for day_2 = 1:3
-                        [r{i,j}(day_1,day_2),p{i,j}(day_1,day_2)]=corr(sampleDataByDay{i}(:,day_1),sampleDataByDay{j}(:,day_2));
-                    end
-                end          
-                z{i,j} = (log(1+r{i,j})-log(1-r{i,j}))/2;
-                meanFisherZ(i,j) = mean(mean(z{i,j},1,'omitnan'),'omitnan');
-            else
-                meanFisherZ(i,j) = NaN;
+% Split-half: between
+diffHalf = combinator(6,6/2,'c');
+for i = 1:length(subj)
+    for j = 1:length(subj)
+        if i > j
+            for k = 1:length(diffHalf)
+                half_1 = mean(dataBySection{i}(:,diffHalf(k,:)),2);
+                half_2 = mean(dataBySection{j}(:,setdiff(1:6,diffHalf(k,:))),2);
+                [r_tmp(k),p_tmp(k)] = corr(half_1,half_2);
             end
+            z_tmp = (log(1+r_tmp)-log(1-r_tmp))/2;
+            z_between_half_all(i,j) = nanmean(nanmean(z_tmp));
+        else
+            z_between_half_all(i,j) = NaN;
         end
     end
-    bootBtwDayAll(iteration) = tanh(mean(mean(meanFisherZ,1,'omitnan'),'omitnan'));
 end
-bootBtwDayAll_sorted = sort(bootBtwDayAll);
-meanBootBtwDayAll = mean(bootBtwDayAll);
-CIBootBtwDayAll = bootBtwDayAll_sorted([iteration*0.025,iteration*0.975]);
-errBarBtwDayAll = abs(CIBootBtwDayAll-meanBootBtwDayAll);
+meanBtwSplitHalfZ = nanmean(nanmean(z_between_half_all));
+meanSplitHalfR = tanh(meanBtwSplitHalfZ);
+
+%% Bootstrap
+% Within
+iteration = 1000;
+bootWithinResult = BootSplitHalf(subjNum,dataBySection,iteration);
+% Between
+bootBtwResult = BootBtw(subjNum,dataBySection,iteration);
 % p value
-bootDiffDistribution = bootWithinDayAll-bootBtwDayAll;
+bootDiffDistribution = bootWithinResult.z-bootBtwResult.z;
 bootPValue = sum(bootDiffDistribution>0)/length(bootDiffDistribution);
 if bootPValue < .5
     bootTwoTailedP = bootPValue*2;
 else
     bootTwoTailedP = (1-bootPValue)*2;
 end
+
+%% Permutation
+iteration = 10000;
+% Within
+permWithinResult = permSplitHalf(subjNum,dataBySection,iteration);
+% p value
+permWithinResult.p = sum(permWithinResult.z<meanSplitHalfZ)/length(permWithinResult.z);
+if permWithinResult.p < .5
+    permWithinResult.p = permWithinResult.p*2;
+else
+    permWithinResult.p = (1-permWithinResult.p)*2;
+end
+% Between
+permBtwResult = permBtw(subjNum,dataBySection,iteration);
+% p value
+permBtwResult.p = sum(permBtwResult.z<meanBtwSplitHalfZ)/length(permBtwResult.z);
+if permBtwResult.p < .5
+    permBtwResult.p = permBtwResult.p*2;
+else
+    permBtwResult.p = (1-permBtwResult.p)*2;
+end
+
+
 % plot
-h = bar([meanBootWithinDayAll,meanBootBtwDayAll]);
+h = bar([meanSplitHalfZ,meanBtwSplitHalfZ]);
 h.FaceColor = [0.75,0.75,0.75];
 h.EdgeColor = 'none';
 hold on;
-H=errorbar([1,2],[meanBootWithinDayAll,meanBootBtwDayAll],...
-    [errBarWithinDayAll(1),errBarBtwDayAll(1)],...
-    [errBarWithinDayAll(2),errBarBtwDayAll(2)]);
+H=errorbar([1,2],[meanSplitHalfZ,meanBtwSplitHalfZ],...
+    [bootWithinResult.errBar(1),bootBtwResult.errBar(1)],...
+    [bootWithinResult.errBar(2),bootBtwResult.errBar(2)]);
 H.LineStyle ='none';
 H.Color = [0 0 0];
+plot([.6 1.4],[permWithinResult.CI(2),permWithinResult.CI(2)]);
+plot([1.6,2.4],[permBtwResult.CI(2),permBtwResult.CI(2)]);
+
 ax = gca;
 ax.XTickLabel = {'Within-subject','Between-subject'};
 ax.YLabel.String = 'Correlation (Pearson R)';
 ax.Title.String='Exp 1B Results';
 text(1.5, .76,'Error bar represents bootstrapping 95% CI');
 % saveas(gcf,'Exp1BEccResults','png');
-saveas(gcf,'Exp1BAngResults','png');
+% saveas(gcf,'Exp1BAngResults','png');

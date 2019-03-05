@@ -22,8 +22,8 @@ end
 % clear outliers
 analysis.angErrorsSD = std(analysis.angErrors);
 analysis.angErrorsMean = mean(analysis.angErrors);
-% analysis.angErrors(analysis.angErrors> (analysis.angErrorsMean + 3*analysis.angErrorsSD)) = analysis.angErrorsMean;
-% analysis.angErrors(analysis.angErrors< (analysis.angErrorsMean - 3*analysis.angErrorsSD)) = analysis.angErrorsMean;
+analysis.angErrors(analysis.angErrors> (analysis.angErrorsMean + 3*analysis.angErrorsSD)) = analysis.angErrorsMean;
+analysis.angErrors(analysis.angErrors< (analysis.angErrorsMean - 3*analysis.angErrorsSD)) = analysis.angErrorsMean;
 
 % calculate mean angular errors
 analysis.angErrorsMat = [analysis.angErrors,params.all_trials(:,1)];
@@ -152,7 +152,7 @@ end
 % draw diff ecc ang error plot
 figure;
 hold on;
-load('data_')
+load('data_all.mat')
 for figNum = 1:length(params.stimEcc)
     plot(params.stimAngles,analysis.diffEccErrorsMean(figNum,:)');
 end
